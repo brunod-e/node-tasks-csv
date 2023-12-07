@@ -29,6 +29,10 @@ export const routes = [
     handler: (req, res) => {
       const { title, description } = req.body
 
+      if (!title || !description) {
+        return res.writeHead(400).end("Title and description are required")
+      }
+
       const task = {
         id: randomUUID(),
         title,
@@ -50,24 +54,36 @@ export const routes = [
       const { id } = req.params
       const { title, description } = req.body
 
-      database.update("tasks", id, {
+      if (!title || !description) {
+        return res.writeHead(400).end("Title and description are required")
+      }
+
+      const isSuccessReq = database.update("tasks", id, {
         title,
         description,
         updated_at: new Date().toISOString(),
       })
+
+      if (!isSuccessReq) {
+        return res.writeHead(404).end("Task not found")
+      }
 
       return res.writeHead(204).end()
     },
   },
   {
     method: "PATCH",
-    path: buildRoutePath("/tasks/:id"),
+    path: buildRoutePath("/tasks/:id/complete"),
     handler: (req, res) => {
       const { id } = req.params
 
-      database.patch("tasks", id, {
+      const isSuccessReq = database.update("tasks", id, {
         completed_at: new Date().toISOString(),
       })
+
+      if (!isSuccessReq) {
+        return res.writeHead(404).end("Task not found")
+      }
 
       return res.writeHead(204).end()
     },
@@ -78,7 +94,11 @@ export const routes = [
     handler: (req, res) => {
       const { id } = req.params
 
-      database.delete("tasks", id)
+      const isSuccessReq = database.delete("tasks", id)
+
+      if (!isSuccessReq) {
+        return res.writeHead(404).end("Task not found")
+      }
 
       return res.writeHead(204).end()
     },
