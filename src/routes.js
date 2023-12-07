@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { Database } from "./database.js"
 import { buildRoutePath } from "./utils/build-route-path.js"
+import { csvParse } from "./utils/csv-parse.js"
 
 const database = new Database()
 
@@ -27,6 +28,19 @@ export const routes = [
     method: "POST",
     path: buildRoutePath("/tasks"),
     handler: (req, res) => {
+      if (req.headers["content-type"].includes("multipart/form-data")) {
+        console.log(req.body)
+        const csvFile = req.body.file
+
+        csvParse(csvFile, database)
+
+        return res.writeHead(201).end()
+      }
+
+      if (req.body === null) {
+        return res.writeHead(400).end("Body is required")
+      }
+
       const { title, description } = req.body
 
       if (!title || !description) {
