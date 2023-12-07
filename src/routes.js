@@ -29,7 +29,6 @@ export const routes = [
     path: buildRoutePath("/tasks"),
     handler: (req, res) => {
       if (req.headers["content-type"].includes("multipart/form-data")) {
-        console.log(req.body)
         const csvFile = req.body.file
 
         csvParse(csvFile, database)

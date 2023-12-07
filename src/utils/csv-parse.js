@@ -25,17 +25,14 @@ export const csvParse = (csvFile, database) => {
         updated_at: new Date().toISOString(),
       }
 
-      console.log(task)
       database.insert("tasks", task)
 
       next()
     },
   })
 
-  console.log("Iniciou", Date())
   readableStream
     .pipe(transformToObject)
     .pipe(transformToString)
     .pipe(writableStreamFile)
-    .on("close", () => console.log("Finalizou", Date()))
 }
